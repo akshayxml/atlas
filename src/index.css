@@ -1,0 +1,17 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  /* A deep, almost-black space base color */
+  background-color: #050505;
+
+  /* Three distinct layers of "stars" created with radial gradients */
+  background-image:
+    radial-gradient(white, rgba(255, 255, 255, .3) 1px, transparent 2px),
+    radial-gradient(white, rgba(255, 255, 255, .2) 1px, transparent 2px),
+    radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 3px);
+
+  /* Offset the layers so they don't overlap, creating a scattered effect */
+  background-size: 200px 200px, 150px 150px, 300px 300px;
+  background-position: 0 0, 40px 60px, 130px 270px;
+}
