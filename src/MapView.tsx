@@ -74,7 +74,7 @@ export default function MapView() {
           anchor="bottom"
           onClose={() => setSelectedPhoto(null)}
           // Styling the popup to match the dark theme
-          style={{ padding: 0, borderRadius: '8px', overflow: 'hidden', backgroundColor: '#1a1a1a', color: 'white' }}
+          style={{ padding: 0, borderRadius: '8px', overflow: 'hidden', color: 'white' }}
         >
           <div style={{ padding: '10px', textAlign: 'center' }}>
             <img
