@@ -1,8 +1,26 @@
+import { useState, useEffect } from 'react';
 import MapView from './MapView';
+import UploadForm from './UploadForm'; 
 
 function App() {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    // Listen for back/forward button navigation
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  if (currentPath === '/upload') {
+    return <UploadForm />;
+  }
+
   return (
-    <div style={{ margin: 0, padding: 0 }}>
+    <div style={{ margin: 0, padding: 0, width: '100vw', height: '100vh' }}>
       <MapView />
     </div>
   );
