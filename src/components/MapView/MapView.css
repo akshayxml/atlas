@@ -1,0 +1,53 @@
+.map-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+}
+
+/* Custom styles for MapLibre/Mapbox popups */
+.mapboxgl-popup-content,
+.maplibregl-popup-content {
+  padding: 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background-color: #1a1a1a !important;
+  color: white !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+.popup-content {
+  padding: 10px;
+  text-align: center;
+}
+
+.popup-image {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.popup-details {
+  padding: 12px;
+}
+
+.popup-title {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.popup-description {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  color: #ccc;
+  line-height: 1.5;
+}
+
+.popup-date {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

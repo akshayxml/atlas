@@ -1,0 +1,132 @@
+.upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #0a0a0a;
+  color: #fff;
+  padding: 20px;
+  font-family: system-ui, sans-serif;
+}
+
+.upload-card {
+  width: 100%;
+  max-width: 480px;
+  background-color: #1a1a1a;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.upload-title {
+  margin: 0 0 5px 0;
+  color: #00f2fe;
+}
+
+.upload-subtitle {
+  margin: 0 0 25px 0;
+  color: #888;
+  font-size: 14px;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 11px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hint {
+  font-size: 11px;
+  color: #555;
+  margin: -10px 0 0 0;
+}
+
+.input {
+  padding: 12px;
+  background-color: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: white;
+  font-size: 15px;
+}
+
+.textarea {
+  padding: 12px;
+  background-color: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: white;
+  font-size: 15px;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.file-input {
+  color: #888;
+  font-size: 14px;
+  padding: 5px 0;
+}
+
+.error-text {
+  color: #ff5252;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.upload-button {
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  color: #000;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+  background-color: #00f2fe;
+}
+
+.upload-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.upload-button.is-success {
+  background-color: #4caf50;
+}
+
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.login-text {
+  color: #aaa;
+  font-size: 14px;
+  text-align: center;
+}
+
+.flex-row {
+  display: flex;
+  gap: 10px;
+}
+
+.flex-1 {
+  flex: 1;
+}
