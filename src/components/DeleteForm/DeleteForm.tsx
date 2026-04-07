@@ -14,7 +14,12 @@ export default function DeleteForm() {
   const [authToken, setAuthToken] = useState<string | null>(null);
 
   const fetchPhotos = useCallback(() => {
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8080';
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+    if (!SERVER_URL) {
+      setError("VITE_SERVER_URL is not defined");
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     fetch(`${SERVER_URL}/api/photos`)
       .then(res => {
@@ -47,7 +52,10 @@ export default function DeleteForm() {
     const confirmed = window.confirm(`Are you sure you want to delete "${photo.title}"?`);
     if (!confirmed) return;
 
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8080';
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+    if (!SERVER_URL) {
+      throw new Error("VITE_SERVER_URL is not defined");
+    }
     try {
       const response = await fetch(`${SERVER_URL}/api/photos/${photo.id}`, {
         method: 'DELETE',

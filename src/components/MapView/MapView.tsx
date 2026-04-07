@@ -13,7 +13,12 @@ export default function MapView() {
 
   // Fetch data from the Go backend
   useEffect(() => {
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8080';
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+    if (!SERVER_URL) {
+      setError("VITE_SERVER_URL is not defined");
+      setIsLoading(false);
+      return;
+    }
     fetch(`${SERVER_URL}/api/photos`)
       .then(res => {
         if (!res.ok) throw new Error("Failed to fetch photos");
