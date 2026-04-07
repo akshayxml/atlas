@@ -94,11 +94,13 @@ export default function MapView() {
             className="map-popup"
           >
             <div className="popup-content">
-              <img
-                src={selectedPhoto.image_url}
-                alt={selectedPhoto.title}
-                className="popup-image"
-              />
+              <a href={selectedPhoto.image_url} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={selectedPhoto.image_url}
+                  alt={selectedPhoto.title}
+                  className="popup-image"
+                />
+              </a>
 
               <div className="popup-details">
                 <h3 className="popup-title">

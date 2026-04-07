@@ -23,8 +23,14 @@
 .popup-image {
   width: 200px;
   height: 150px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 4px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.popup-image:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
 }
 
 .popup-details {
