@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import './UploadForm.css';
-import { extractLocationFromExif, getBrowserLocation } from '../../utils/gps';
+import { extractLocationFromExif, getBrowserLocation, extractMetadataFromExif } from '../../utils/gps';
 import { navigate } from '../../utils/navigation';
 
 type Status = 'idle' | 'locating' | 'uploading' | 'success' | 'error' | 'using-photo-gps';
@@ -11,6 +11,22 @@ export default function UploadForm() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const [authToken, setAuthToken] = useState<string | null>(null);
+
+  const [extractedLat, setExtractedLat] = useState('');
+  const [extractedLng, setExtractedLng] = useState('');
+  const [extractedDate, setExtractedDate] = useState('');
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const metadata = await extractMetadataFromExif(file);
+      if (metadata) {
+        if (metadata.lat) setExtractedLat(metadata.lat);
+        if (metadata.lng) setExtractedLng(metadata.lng);
+        if (metadata.date) setExtractedDate(metadata.date);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -129,24 +145,49 @@ export default function UploadForm() {
 
             <div className="input-group">
               <label className="label">Captured Date (Optional)</label>
-              <input type="date" name="captured_at" className="input" />
+              <input
+                type="date"
+                name="captured_at"
+                className="input"
+                value={extractedDate}
+                onChange={e => setExtractedDate(e.target.value)}
+              />
             </div>
 
             <div className="flex-row">
               <div className="input-group flex-1">
                 <label className="label">Lat (Manual)</label>
-                <input name="lat_manual" placeholder="12.97" className="input" />
+                <input
+                  name="lat_manual"
+                  placeholder="12.97"
+                  className="input"
+                  value={extractedLat}
+                  onChange={e => setExtractedLat(e.target.value)}
+                />
               </div>
               <div className="input-group flex-1">
                 <label className="label">Lng (Manual)</label>
-                <input name="lng_manual" placeholder="77.59" className="input" />
+                <input
+                  name="lng_manual"
+                  placeholder="77.59"
+                  className="input"
+                  value={extractedLng}
+                  onChange={e => setExtractedLng(e.target.value)}
+                />
               </div>
             </div>
             <p className="hint">Leave coordinates blank to extract from photo or use GPS.</p>
 
             <div className="input-group">
               <label className="label">Photo</label>
-              <input type="file" name="image" accept="image/*" required className="file-input" />
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                required
+                className="file-input"
+                onChange={handleFileChange}
+              />
             </div>
 
             <button
