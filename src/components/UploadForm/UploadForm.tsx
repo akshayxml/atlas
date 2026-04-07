@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 import './UploadForm.css';
 import { extractLocationFromExif, getBrowserLocation } from '../../utils/gps';
 import { navigate } from '../../utils/navigation';
@@ -11,14 +11,6 @@ export default function UploadForm() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const [authToken, setAuthToken] = useState<string | null>(null);
-
-  const login = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      setAuthToken(tokenResponse.access_token);
-      setErrorMessage('');
-    },
-    onError: () => setErrorMessage("Google Login Failed"),
-  });
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,7 +28,7 @@ export default function UploadForm() {
     const manualLng = formData.get('lng_manual') as string;
 
     if (manualLat && manualLng) {
-      await performUpload(formData, manualLat, manualLng);
+      await performUpload(formData, manualLat, manualLng, form);
     } else {
       const imageFile = formData.get('image') as File;
       if (imageFile) {
@@ -45,7 +37,7 @@ export default function UploadForm() {
         if (gps) {
           setStatus('using-photo-gps');
           await new Promise(resolve => setTimeout(resolve, 1500));
-          await performUpload(formData, gps.lat, gps.lng);
+          await performUpload(formData, gps.lat, gps.lng, form);
           return;
         }
       }
@@ -53,7 +45,7 @@ export default function UploadForm() {
       setStatus('locating');
       try {
         const coords = await getBrowserLocation();
-        await performUpload(formData, coords.lat, coords.lng);
+        await performUpload(formData, coords.lat, coords.lng, form);
       } catch (err) {
         setErrorMessage(err instanceof Error ? err.message : "Location access denied. Please enter coordinates manually.");
         setStatus('error');
@@ -61,7 +53,7 @@ export default function UploadForm() {
     }
   };
 
-  const performUpload = async (formData: FormData, lat: string, lng: string) => {
+  const performUpload = async (formData: FormData, lat: string, lng: string, form: HTMLFormElement) => {
     setStatus('uploading');
 
     formData.append('lat', lat);
@@ -83,8 +75,9 @@ export default function UploadForm() {
       }
 
       setStatus('success');
+      form.reset();
       setTimeout(() => {
-        navigate('/');
+        setStatus('idle');
       }, 2000);
 
     } catch (err) {
@@ -97,7 +90,10 @@ export default function UploadForm() {
   return (
     <div className="upload-container">
       <div className="upload-card">
-        <h2 className="upload-title">Add to Atlas</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className="upload-title">Add to Atlas</h2>
+          <button onClick={() => navigate('/')} className="back-button">Back to Map</button>
+        </div>
         <p className="upload-subtitle">Create a new memory on your map</p>
 
         {!authToken ? (
@@ -105,9 +101,15 @@ export default function UploadForm() {
             <p className="login-text">
               Authentication required to modify the Atlas.
             </p>
-            <button onClick={() => login()} className="upload-button">
-              Sign in with Google
-            </button>
+            <GoogleLogin
+              onSuccess={credentialResponse => {
+                if (credentialResponse.credential) {
+                  setAuthToken(credentialResponse.credential);
+                  setErrorMessage('');
+                }
+              }}
+              onError={() => setErrorMessage("Google Login Failed")}
+            />
             {errorMessage && <p className="error-text">{errorMessage}</p>}
           </div>
         ) : (

@@ -3,7 +3,8 @@ import { useRef, useCallback, useEffect, useState } from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './DeleteForm.css';
 import type { PhotoData } from '../../types';
-import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
+import { navigate } from '../../utils/navigation';
 
 export default function DeleteForm() {
   const mapRef = useRef<MapRef>(null);
@@ -11,13 +12,6 @@ export default function DeleteForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
-
-  const login = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      setAuthToken(tokenResponse.access_token);
-    },
-    onError: () => console.error("Google Login Failed"),
-  });
 
   const fetchPhotos = useCallback(() => {
     const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:8080';
@@ -46,8 +40,7 @@ export default function DeleteForm() {
 
   const handleDelete = async (photo: PhotoData) => {
     if (!authToken) {
-      alert("Please sign in first to delete entries.");
-      login();
+      alert("Please sign in using the Google button at the top first to delete entries.");
       return;
     }
 
@@ -103,13 +96,21 @@ export default function DeleteForm() {
     <div className="delete-container">
       <div className="delete-header">
         <h2 className="delete-title">Delete Mode</h2>
-        {!authToken ? (
-          <button onClick={() => login()} className="login-button">
-            Sign in with Google
-          </button>
-        ) : (
-          <span className="auth-status">Authenticated</span>
-        )}
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button onClick={() => navigate('/')} className="back-button">Back to Map</button>
+          {!authToken ? (
+            <GoogleLogin
+              onSuccess={credentialResponse => {
+                if (credentialResponse.credential) {
+                  setAuthToken(credentialResponse.credential);
+                }
+              }}
+              onError={() => console.error("Google Login Failed")}
+            />
+          ) : (
+            <span className="auth-status">Authenticated</span>
+          )}
+        </div>
       </div>
       
       <div className="map-container">

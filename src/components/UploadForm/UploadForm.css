@@ -130,3 +130,20 @@
 .flex-1 {
   flex: 1;
 }
+
+.back-button {
+  background: transparent;
+  color: #888;
+  border: 1px solid #444;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  color: white;
+  border-color: #666;
+  background-color: rgba(255, 255, 255, 0.05);
+}
