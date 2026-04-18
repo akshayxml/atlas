@@ -27,6 +27,23 @@ const LOADING_SCREEN_MESSAGES = [
   "Final approach initiated. Please ensure your tray tables are in their upright position."
 ];
 
+interface ImageMarkerProps {
+  photo: PhotoData;
+}
+
+function ImageMarker({ photo }: ImageMarkerProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  return (
+    <div className={`custom-marker ${isLoaded ? 'loaded' : 'loading'}`}>
+      <img
+        src={photo.image_url}
+        alt={photo.title}
+        onLoad={() => setIsLoaded(true)}
+        style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
+      />
+    </div>
+  );
+}
 
 export default function MapView() {
   const mapRef = useRef<MapRef>(null);
@@ -121,12 +138,13 @@ export default function MapView() {
             key={photo.id}
             longitude={photo.location.lng}
             latitude={photo.location.lat}
-            color="#e8638b"
             onClick={e => {
               e.originalEvent.stopPropagation();
               setSelectedPhoto(photo);
             }}
-          />
+          >
+            <ImageMarker photo={photo} />
+          </Marker>
         ))}
 
         {selectedPhoto && (
