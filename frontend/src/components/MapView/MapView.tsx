@@ -170,7 +170,7 @@ export default function MapView() {
                 </h3>
 
                 <p className="popup-description">
-                  {selectedPhoto.description || "No description provided."}
+                  {selectedPhoto.description}
                 </p>
 
                 <div className="popup-date">
