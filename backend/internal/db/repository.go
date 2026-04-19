@@ -87,3 +87,14 @@ func DeleteEntry(ctx context.Context, id string) error {
 	_, err := Pool.Exec(ctx, query, id)
 	return err
 }
+
+// UpdateEntry updates a specific atlas record by ID
+func UpdateEntry(ctx context.Context, id, title, description, lng, lat, capturedAt string) error {
+	query := `
+		UPDATE atlas 
+		SET title = $2, description = $3, location = ST_SetSRID(ST_MakePoint($4, $5), 4326), captured_at = $6
+		WHERE id = $1`
+
+	_, err := Pool.Exec(ctx, query, id, title, description, lng, lat, capturedAt)
+	return err
+}

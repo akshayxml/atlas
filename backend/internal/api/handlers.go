@@ -243,3 +243,73 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "healthy", "database": "connected"})
 }
 
+// UpdateHandler handles updating a photo entry
+func UpdateHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPatch && r.Method != http.MethodPut {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Auth
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Missing Authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	email, err := auth.GetGoogleEmail(token)
+
+	allowedEmail := os.Getenv("ALLOWED_EMAIL")
+	if allowedEmail == "" {
+		log.Printf("ERROR: ALLOWED_EMAIL environment variable is not set")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if err != nil || email != allowedEmail {
+		log.Printf("Auth failed for email: %s, error: %v", email, err)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	id := r.PathValue("id")
+	if id == "" {
+		http.Error(w, "Missing photo ID", http.StatusBadRequest)
+		return
+	}
+
+	var req struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Lat         string `json:"lat"`
+		Lng         string `json:"lng"`
+		CapturedAt  string `json:"captured_at"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Validate coordinates if provided
+	if req.Lat != "" || req.Lng != "" {
+		lat, errLat := strconv.ParseFloat(req.Lat, 64)
+		lng, errLng := strconv.ParseFloat(req.Lng, 64)
+		if errLat != nil || errLng != nil || lat < -90 || lat > 90 || lng < -180 || lng > 180 {
+			http.Error(w, "Invalid coordinates", http.StatusBadRequest)
+			return
+		}
+	}
+
+	err = db.UpdateEntry(r.Context(), id, req.Title, req.Description, req.Lng, req.Lat, req.CapturedAt)
+	if err != nil {
+		log.Printf("Failed to update entry: %v", err)
+		http.Error(w, "Failed to update database record", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, "Updated successfully")
+}
+

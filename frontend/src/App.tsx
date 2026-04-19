@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import MapView from './components/MapView/MapView';
 import UploadForm from './components/UploadForm/UploadForm';
 import DeleteForm from './components/DeleteForm/DeleteForm';
+import UpdateForm from './components/UpdateForm/UpdateForm';
 
 function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -20,6 +21,8 @@ function App() {
     return <UploadForm />;
   } else if (currentPath == "/delete") {
     return <DeleteForm />;
+  } else if (currentPath === "/update") {
+    return <UpdateForm />;
   }
 
   return (

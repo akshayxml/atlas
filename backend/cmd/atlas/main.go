@@ -26,6 +26,7 @@ func main() {
 	http.HandleFunc("/api/photos", api.EnableCORS(api.RateLimit(api.GetAtlasEntries)))
 	http.HandleFunc("/api/upload", api.EnableCORS(api.RateLimit(api.UploadHandler)))
 	http.HandleFunc("/api/photos/{id}", api.EnableCORS(api.RateLimit(api.DeleteHandler)))
+	http.HandleFunc("PATCH /api/photos/{id}", api.EnableCORS(api.RateLimit(api.UpdateHandler)))
 	http.HandleFunc("/api/health", api.EnableCORS(api.HealthCheckHandler))
 
 
