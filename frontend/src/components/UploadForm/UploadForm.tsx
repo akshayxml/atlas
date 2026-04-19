@@ -95,6 +95,9 @@ export default function UploadForm() {
 
       setStatus('success');
       form.reset();
+      setExtractedDate('');
+      setExtractedLat('');
+      setExtractedLng('');
       setTimeout(() => {
         setStatus('idle');
       }, 2000);
