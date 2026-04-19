@@ -3,6 +3,8 @@ import { useRef, useCallback, useEffect, useState } from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './MapView.css';
 import type { PhotoData } from '../../types';
+import { usePhotos } from '../../hooks/usePhotos';
+import PhotoMarker from '../PhotoMarker/PhotoMarker';
 
 const LOADING_SCREEN_MESSAGES = [
   "Checking in the database at the virtual terminal...",
@@ -27,30 +29,10 @@ const LOADING_SCREEN_MESSAGES = [
   "Final approach initiated. Please ensure your tray tables are in their upright position."
 ];
 
-interface ImageMarkerProps {
-  photo: PhotoData;
-}
-
-function ImageMarker({ photo }: ImageMarkerProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
-  return (
-    <div className={`custom-marker ${isLoaded ? 'loaded' : 'loading'}`}>
-      <img
-        src={photo.image_url}
-        alt={photo.title}
-        onLoad={() => setIsLoaded(true)}
-        style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
-      />
-    </div>
-  );
-}
-
 export default function MapView() {
   const mapRef = useRef<MapRef>(null);
-  const [photos, setPhotos] = useState<PhotoData[]>([]);
+  const { photos, isLoading, error } = usePhotos();
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [messageIndex, setMessageIndex] = useState(0);
   const [dots, setDots] = useState('.');
 
@@ -79,31 +61,7 @@ export default function MapView() {
   }, [isLoading]);
 
 
-  // Fetch data from the Go backend
-  useEffect(() => {
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-    if (!SERVER_URL) {
-      setError("VITE_SERVER_URL is not defined");
-      setIsLoading(false);
-      return;
-    }
-    fetch(`${SERVER_URL}/api/photos`)
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch photos");
-        return res.json();
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setPhotos(data);
-        }
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch photos:", err);
-        setError(err.message || "Failed to load photos");
-        setIsLoading(false);
-      });
-  }, []);
+
 
   const onMapLoad = useCallback(() => {
     if (mapRef.current) {
@@ -143,7 +101,7 @@ export default function MapView() {
               setSelectedPhoto(photo);
             }}
           >
-            <ImageMarker photo={photo} />
+            <PhotoMarker photo={photo} />
           </Marker>
         ))}
 

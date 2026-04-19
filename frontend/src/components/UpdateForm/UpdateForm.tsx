@@ -5,30 +5,12 @@ import './UpdateForm.css';
 import type { PhotoData } from '../../types';
 import { GoogleLogin } from '@react-oauth/google';
 import { navigate } from '../../utils/navigation';
-
-interface ImageMarkerProps {
-  photo: PhotoData;
-}
-
-function ImageMarker({ photo }: ImageMarkerProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
-  return (
-    <div className={`custom-marker ${isLoaded ? 'loaded' : 'loading'}`}>
-      <img
-        src={photo.thumb_url || photo.image_url}
-        alt={photo.title}
-        onLoad={() => setIsLoaded(true)}
-        style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
-      />
-    </div>
-  );
-}
+import { usePhotos } from '../../hooks/usePhotos';
+import PhotoMarker from '../PhotoMarker/PhotoMarker';
 
 export default function UpdateForm() {
   const mapRef = useRef<MapRef>(null);
-  const [photos, setPhotos] = useState<PhotoData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { photos, isLoading, error, refetch } = usePhotos();
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoData | null>(null);
 
@@ -40,35 +22,7 @@ export default function UpdateForm() {
   const [date, setDate] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const fetchPhotos = useCallback(() => {
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-    if (!SERVER_URL) {
-      setError("VITE_SERVER_URL is not defined");
-      setIsLoading(false);
-      return;
-    }
-    setIsLoading(true);
-    fetch(`${SERVER_URL}/api/photos`)
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch photos");
-        return res.json();
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setPhotos(data);
-        }
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch photos:", err);
-        setError(err.message || "Failed to load photos");
-        setIsLoading(false);
-      });
-  }, []);
 
-  useEffect(() => {
-    fetchPhotos();
-  }, [fetchPhotos]);
 
   useEffect(() => {
     if (selectedPhoto) {
@@ -113,7 +67,7 @@ export default function UpdateForm() {
 
       alert("Updated successfully!");
       setSelectedPhoto(null);
-      fetchPhotos(); // Refresh map
+      refetch(); // Refresh map
     } catch (err) {
       console.error("Update Error:", err);
       alert(`Failed to update: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -180,7 +134,7 @@ export default function UpdateForm() {
                   setSelectedPhoto(photo);
                 }}
               >
-                <ImageMarker photo={photo} />
+                <PhotoMarker photo={photo} />
               </Marker>
             ))}
           </Map>

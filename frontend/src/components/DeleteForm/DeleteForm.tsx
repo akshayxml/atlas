@@ -1,65 +1,19 @@
 import Map, { type MapRef, Marker } from 'react-map-gl/maplibre';
-import { useRef, useCallback, useEffect, useState } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './DeleteForm.css';
 import type { PhotoData } from '../../types';
 import { GoogleLogin } from '@react-oauth/google';
 import { navigate } from '../../utils/navigation';
-
-interface ImageMarkerProps {
-  photo: PhotoData;
-}
-
-function ImageMarker({ photo }: ImageMarkerProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
-  return (
-    <div className={`custom-marker ${isLoaded ? 'loaded' : 'loading'}`}>
-      <img
-        src={photo.image_url}
-        alt={photo.title}
-        onLoad={() => setIsLoaded(true)}
-        style={{ opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
-      />
-    </div>
-  );
-}
+import { usePhotos } from '../../hooks/usePhotos';
+import PhotoMarker from '../PhotoMarker/PhotoMarker';
 
 export default function DeleteForm() {
   const mapRef = useRef<MapRef>(null);
-  const [photos, setPhotos] = useState<PhotoData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { photos, isLoading, error, refetch } = usePhotos();
   const [authToken, setAuthToken] = useState<string | null>(null);
 
-  const fetchPhotos = useCallback(() => {
-    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-    if (!SERVER_URL) {
-      setError("VITE_SERVER_URL is not defined");
-      setIsLoading(false);
-      return;
-    }
-    setIsLoading(true);
-    fetch(`${SERVER_URL}/api/photos`)
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch photos");
-        return res.json();
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setPhotos(data);
-        }
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch photos:", err);
-        setError(err.message || "Failed to load photos");
-        setIsLoading(false);
-      });
-  }, []);
 
-  useEffect(() => {
-    fetchPhotos();
-  }, [fetchPhotos]);
 
   const handleDelete = async (photo: PhotoData) => {
     if (!authToken) {
@@ -88,7 +42,7 @@ export default function DeleteForm() {
       }
 
       alert("Deleted successfully!");
-      fetchPhotos(); // Refresh map
+      refetch(); // Refresh map
     } catch (err) {
       console.error("Delete Error:", err);
       alert(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -160,7 +114,7 @@ export default function DeleteForm() {
                 handleDelete(photo);
               }}
             >
-              <ImageMarker photo={photo} />
+              <PhotoMarker photo={photo} />
             </Marker>
           ))}
         </Map>
